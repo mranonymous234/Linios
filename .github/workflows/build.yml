@@ -35,6 +35,7 @@ jobs:
       - name: Configure and build QEMU
         run: |
           cd $BUILD_DIR/qemu-$QEMU_VERSION
+          export PKG_CONFIG_LIBDIR=""
           export CC="$(xcrun -f clang)"
           export CFLAGS="-arch $IOS_ARCH -isysroot $IOS_SDK -miphoneos-version-min=14.0 -O2 -fembed-bitcode"
           export LDFLAGS="-arch $IOS_ARCH -isysroot $IOS_SDK -miphoneos-version-min=14.0 -fembed-bitcode"
@@ -42,6 +43,9 @@ jobs:
           ./configure \
             --target-list=i386-softmmu \
             --disable-tcg \
+            --disable-gtk \
+            --disable-sdl \
+            --disable-glusterfs \
             --enable-debug \
             --static \
             --prefix="$BUILD_DIR/install" \
