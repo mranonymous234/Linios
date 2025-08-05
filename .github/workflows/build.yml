@@ -55,7 +55,7 @@ jobs:
           strip $BUILD_DIR/install/bin/qemu-system-i386
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: qemu-system-i386-ios
           path: ${{ env.BUILD_DIR }}/install/bin/qemu-system-i386
