@@ -20,7 +20,7 @@ jobs:
 
       - name: Set variables
         run: |
-          echo "QEMU_VERSION=7.3.0" >> $GITHUB_ENV
+          echo "QEMU_VERSION=7.2.9" >> $GITHUB_ENV
           echo "IOS_SDK=$(xcrun --sdk iphoneos --show-sdk-path)" >> $GITHUB_ENV
           echo "IOS_ARCH=arm64" >> $GITHUB_ENV
           echo "BUILD_DIR=$(pwd)/qemu-ios-build" >> $GITHUB_ENV
@@ -29,7 +29,7 @@ jobs:
         run: |
           mkdir -p $BUILD_DIR
           cd $BUILD_DIR
-          curl -LO https://download.qemu.org/qemu-$QEMU_VERSION.tar.xz
+          curl -L --fail -O https://download.qemu.org/qemu-$QEMU_VERSION.tar.xz
           tar xf qemu-$QEMU_VERSION.tar.xz
 
       - name: Configure and build QEMU
@@ -55,7 +55,7 @@ jobs:
           strip $BUILD_DIR/install/bin/qemu-system-i386
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: qemu-system-i386-ios
           path: ${{ env.BUILD_DIR }}/install/bin/qemu-system-i386
