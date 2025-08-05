@@ -1,0 +1,61 @@
+name: Build QEMU for iOS ARM64
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_qemu_ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install pkg-config libtool glib pixman
+
+      - name: Set variables
+        run: |
+          echo "QEMU_VERSION=7.3.0" >> $GITHUB_ENV
+          echo "IOS_SDK=$(xcrun --sdk iphoneos --show-sdk-path)" >> $GITHUB_ENV
+          echo "IOS_ARCH=arm64" >> $GITHUB_ENV
+          echo "BUILD_DIR=$(pwd)/qemu-ios-build" >> $GITHUB_ENV
+
+      - name: Download QEMU source
+        run: |
+          mkdir -p $BUILD_DIR
+          cd $BUILD_DIR
+          curl -LO https://download.qemu.org/qemu-$QEMU_VERSION.tar.xz
+          tar xf qemu-$QEMU_VERSION.tar.xz
+
+      - name: Configure and build QEMU
+        run: |
+          cd $BUILD_DIR/qemu-$QEMU_VERSION
+          export CC="$(xcrun -f clang)"
+          export CFLAGS="-arch $IOS_ARCH -isysroot $IOS_SDK -miphoneos-version-min=14.0 -O2 -fembed-bitcode"
+          export LDFLAGS="-arch $IOS_ARCH -isysroot $IOS_SDK -miphoneos-version-min=14.0 -fembed-bitcode"
+
+          ./configure \
+            --target-list=i386-softmmu \
+            --disable-tcg \
+            --enable-debug \
+            --static \
+            --prefix="$BUILD_DIR/install" \
+            --cross-prefix="" \
+            --cc="$CC"
+
+          make -j$(sysctl -n hw.ncpu)
+
+          mkdir -p $BUILD_DIR/install/bin
+          cp build/i386-softmmu/qemu-system-i386 $BUILD_DIR/install/bin/
+          strip $BUILD_DIR/install/bin/qemu-system-i386
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: qemu-system-i386-ios
+          path: ${{ env.BUILD_DIR }}/install/bin/qemu-system-i386
