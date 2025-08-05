@@ -35,7 +35,7 @@ jobs:
       - name: Configure and build QEMU
         run: |
           cd $BUILD_DIR/qemu-$QEMU_VERSION
-          export PKG_CONFIG=""
+          export PKG_CONFIG="/usr/bin/true"
           export CC="$(xcrun -f clang)"
           export CFLAGS="-arch $IOS_ARCH -isysroot $IOS_SDK -miphoneos-version-min=14.0 -O2 -fembed-bitcode"
           export LDFLAGS="-arch $IOS_ARCH -isysroot $IOS_SDK -miphoneos-version-min=14.0 -fembed-bitcode"
