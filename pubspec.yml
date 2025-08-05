@@ -1,0 +1,13 @@
+name: linux_in_flutter
+description: Run Tiny Core Linux inside a Flutter iOS app
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.0 <4.0.0"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/tinycore.iso
+    - assets/qemu-system-i386
